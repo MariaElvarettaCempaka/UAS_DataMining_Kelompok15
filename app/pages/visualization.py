@@ -33,11 +33,23 @@ CLUSTER_COLORS = {
 }
 
 # 1. CACHED DATA LOADER
+import zipfile
+
 @st.cache_data
 def load_data():
-    csv_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'steam_games_clustered.csv'))
-    if os.path.exists(csv_path):
-        return pd.read_csv(csv_path)
+    zip_path = os.path.abspath(
+        os.path.join(
+            os.path.dirname(__file__),
+            '..', '..', 'data', 'steam_games_clustered.zip'
+        )
+    )
+
+    if os.path.exists(zip_path):
+        with zipfile.ZipFile(zip_path) as z:
+            csv_file = z.namelist()[0]
+            with z.open(csv_file) as f:
+                return pd.read_csv(f)
+
     return None
 
 @st.cache_resource
