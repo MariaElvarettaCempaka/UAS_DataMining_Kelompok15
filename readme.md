@@ -55,7 +55,7 @@ UAS_DataMining_Kelompok15/
 │   └── analysis.ipynb
 │
 ├── laporan/
-│   └── laporan.pdf
+│   └── Artikel KEL_15 UAS KELAS KDD-01.pdf
 │
 ├── readme.md
 ├── requirements.txt
