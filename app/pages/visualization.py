@@ -40,35 +40,38 @@ import streamlit as st
 
 @st.cache_data
 def load_data():
-    zip_path = os.path.abspath(
-        os.path.join(
-            os.path.dirname(__file__),
-            "..",
-            "..",
+    try:
+        base_dir = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "..", "..")
+        )
+
+        zip_path = os.path.join(
+            base_dir,
             "data",
             "steam_games_clustered.zip"
         )
-    )
 
-    if not os.path.exists(zip_path):
-        st.error(f"File tidak ditemukan: {zip_path}")
-        return None
+        if not os.path.exists(zip_path):
+            st.error(f"Dataset tidak ditemukan:\n{zip_path}")
+            return None
 
-    try:
         with zipfile.ZipFile(zip_path, "r") as z:
-            csv_files = [f for f in z.namelist() if f.endswith(".csv")]
+            csv_files = [
+                f for f in z.namelist()
+                if f.lower().endswith(".csv")
+            ]
 
             if not csv_files:
-                st.error("Tidak ada file CSV di dalam ZIP.")
+                st.error("File CSV tidak ditemukan di dalam ZIP.")
                 return None
 
             with z.open(csv_files[0]) as f:
                 df = pd.read_csv(f)
 
-            return df
+        return df
 
     except Exception as e:
-        st.error(f"Gagal membaca dataset: {e}")
+        st.error(f"Gagal memuat dataset: {e}")
         return None
 
 @st.cache_resource
