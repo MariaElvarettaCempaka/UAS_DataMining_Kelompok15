@@ -33,36 +33,30 @@ CLUSTER_COLORS = {
 }
 
 # 1. CACHED DATA LOADER
-import os
 import zipfile
-import pandas as pd
-import streamlit as st
 
 @st.cache_data
 def load_data():
+    zip_path = os.path.abspath(
+        os.path.join(
+            os.path.dirname(__file__),
+            '..',
+            '..',
+            'data',
+            'steam_games_clustered.zip'
+        )
+    )
+
+    if not os.path.exists(zip_path):
+        st.error(f"Dataset tidak ditemukan: {zip_path}")
+        return None
+
     try:
-        base_dir = os.path.abspath(
-            os.path.join(os.path.dirname(__file__), "..", "..")
-        )
-
-        zip_path = os.path.join(
-            base_dir,
-            "data",
-            "steam_games_clustered.zip"
-        )
-
-        if not os.path.exists(zip_path):
-            st.error(f"Dataset tidak ditemukan:\n{zip_path}")
-            return None
-
-        with zipfile.ZipFile(zip_path, "r") as z:
-            csv_files = [
-                f for f in z.namelist()
-                if f.lower().endswith(".csv")
-            ]
+        with zipfile.ZipFile(zip_path, 'r') as z:
+            csv_files = [f for f in z.namelist() if f.endswith('.csv')]
 
             if not csv_files:
-                st.error("File CSV tidak ditemukan di dalam ZIP.")
+                st.error("Tidak ada file CSV di dalam ZIP.")
                 return None
 
             with z.open(csv_files[0]) as f:
@@ -71,9 +65,9 @@ def load_data():
         return df
 
     except Exception as e:
-        st.error(f"Gagal memuat dataset: {e}")
+        st.error(f"Gagal membaca ZIP: {e}")
         return None
-
+        
 @st.cache_resource
 def load_model():
     base_dir = os.path.dirname(os.path.abspath(__file__))
