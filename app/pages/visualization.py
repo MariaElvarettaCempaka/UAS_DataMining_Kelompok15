@@ -33,24 +33,43 @@ CLUSTER_COLORS = {
 }
 
 # 1. CACHED DATA LOADER
+import os
 import zipfile
+import pandas as pd
+import streamlit as st
 
 @st.cache_data
 def load_data():
     zip_path = os.path.abspath(
         os.path.join(
             os.path.dirname(__file__),
-            '..', '..', 'data', 'steam_games_clustered.zip'
+            "..",
+            "..",
+            "data",
+            "steam_games_clustered.zip"
         )
     )
 
-    if os.path.exists(zip_path):
-        with zipfile.ZipFile(zip_path) as z:
-            csv_file = z.namelist()[0]
-            with z.open(csv_file) as f:
-                return pd.read_csv(f)
+    if not os.path.exists(zip_path):
+        st.error(f"File tidak ditemukan: {zip_path}")
+        return None
 
-    return None
+    try:
+        with zipfile.ZipFile(zip_path, "r") as z:
+            csv_files = [f for f in z.namelist() if f.endswith(".csv")]
+
+            if not csv_files:
+                st.error("Tidak ada file CSV di dalam ZIP.")
+                return None
+
+            with z.open(csv_files[0]) as f:
+                df = pd.read_csv(f)
+
+            return df
+
+    except Exception as e:
+        st.error(f"Gagal membaca dataset: {e}")
+        return None
 
 @st.cache_resource
 def load_model():
