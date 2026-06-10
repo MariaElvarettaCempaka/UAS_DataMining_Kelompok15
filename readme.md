@@ -35,6 +35,7 @@ UAS_DataMining_Kelompok15/
 │
 ├── app/
 │   ├── pages/
+│   │   ├── __pycache__/
 │   │   ├── about.py
 │   │   ├── dataset.py
 │   │   ├── home.py
